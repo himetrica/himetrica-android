@@ -2,6 +2,8 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
+    `maven-publish`
+    signing
 }
 
 android {
@@ -39,6 +41,77 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"
+    }
+}
+
+val libVersion = findProperty("VERSION_NAME")?.toString() ?: "0.1.0"
+
+android.publishing {
+    singleVariant("release") {
+        withSourcesJar()
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+
+                groupId = "com.himetrica.tracker"
+                artifactId = "himetrica-android"
+                version = libVersion
+
+                pom {
+                    name.set("Himetrica Android SDK")
+                    description.set("Analytics SDK for Android apps")
+                    url.set("https://github.com/himetrica/himetrica-android")
+
+                    licenses {
+                        license {
+                            name.set("MIT License")
+                            url.set("https://opensource.org/licenses/MIT")
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id.set("himetrica")
+                            name.set("Himetrica")
+                            email.set("hello@himetrica.com")
+                        }
+                    }
+
+                    scm {
+                        connection.set("scm:git:git://github.com/himetrica/himetrica-android.git")
+                        developerConnection.set("scm:git:ssh://github.com:himetrica/himetrica-android.git")
+                        url.set("https://github.com/himetrica/himetrica-android")
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                name = "sonatype"
+                val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                url = if (libVersion.endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
+                credentials {
+                    username = findProperty("OSSRH_USERNAME")?.toString() ?: System.getenv("OSSRH_USERNAME") ?: ""
+                    password = findProperty("OSSRH_PASSWORD")?.toString() ?: System.getenv("OSSRH_PASSWORD") ?: ""
+                }
+            }
+        }
+    }
+
+    signing {
+        val signingKey = findProperty("SIGNING_KEY")?.toString() ?: System.getenv("SIGNING_KEY")
+        val signingPassword = findProperty("SIGNING_PASSWORD")?.toString() ?: System.getenv("SIGNING_PASSWORD")
+        if (signingKey != null && signingPassword != null) {
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            sign(publishing.publications["release"])
+        }
     }
 }
 
