@@ -23,6 +23,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Generate Gradle wrapper
+        run: gradle wrapper --gradle-version 8.5
+
       - name: Build & publish to Maven Central
         run: ./gradlew :himetrica:publishReleasePublicationToSonatypeRepository -PVERSION_NAME=${{ inputs.version }}
         env:
