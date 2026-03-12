@@ -26,13 +26,30 @@ jobs:
       - name: Generate Gradle wrapper
         run: gradle wrapper --gradle-version 8.5
 
-      - name: Build & publish to Maven Central
-        run: ./gradlew :himetrica:publishReleasePublicationToSonatypeRepository -PVERSION_NAME=${{ inputs.version }}
+      - name: Build & publish to local staging
+        run: ./gradlew :himetrica:publishReleasePublicationToStagingRepository -PVERSION_NAME=${{ inputs.version }}
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+
+      - name: Bundle and upload to Maven Central
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          cd himetrica/build/staging-deploy
+          zip -r ../../../bundle.zip .
+          cd ../../..
+
+          # Build Bearer token (base64 of username:password)
+          TOKEN=$(printf '%s:%s' "$OSSRH_USERNAME" "$OSSRH_PASSWORD" | base64 -w0)
+
+          # Upload to Central Portal
+          curl --fail-with-body \
+            --request POST \
+            --header "Authorization: Bearer $TOKEN" \
+            --form bundle=@bundle.zip \
+            "https://central.sonatype.com/api/v1/publisher/upload?publishingType=AUTOMATIC&name=com.himetrica.tracker:himetrica-android:${{ inputs.version }}"
 
       - name: Create GitHub release
         env:
