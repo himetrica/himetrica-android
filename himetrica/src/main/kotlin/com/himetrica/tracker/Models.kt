@@ -1,4 +1,4 @@
-package com.himetrica.android
+package com.himetrica.tracker
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement

@@ -1,4 +1,4 @@
-package com.himetrica.android
+package com.himetrica.tracker
 
 /**
  * Configuration for the Himetrica SDK.
@@ -20,8 +20,6 @@ data class HimetricaConfig(
     val maxQueueSize: Int = 1000,
     /** Interval for flushing the event queue in milliseconds (default 30s). */
     val flushIntervalMs: Long = 30_000L,
-    /** Capture uncaught exceptions. */
-    val captureUncaughtExceptions: Boolean = true,
     /** Maximum errors per rate limit window. */
     val errorRateLimit: Int = 10,
     /** Rate limit window in milliseconds (default 60s). */
@@ -42,7 +40,6 @@ data class HimetricaConfig(
         private var enableLogging: Boolean = false
         private var maxQueueSize: Int = 1000
         private var flushIntervalMs: Long = 30_000L
-        private var captureUncaughtExceptions: Boolean = true
         private var errorRateLimit: Int = 10
         private var errorRateLimitWindowMs: Long = 60_000L
 
@@ -52,7 +49,6 @@ data class HimetricaConfig(
         fun enableLogging(enabled: Boolean) = apply { enableLogging = enabled }
         fun maxQueueSize(size: Int) = apply { maxQueueSize = size }
         fun flushIntervalMs(ms: Long) = apply { flushIntervalMs = ms }
-        fun captureUncaughtExceptions(enabled: Boolean) = apply { captureUncaughtExceptions = enabled }
         fun errorRateLimit(limit: Int) = apply { errorRateLimit = limit }
         fun errorRateLimitWindowMs(ms: Long) = apply { errorRateLimitWindowMs = ms }
 
@@ -64,7 +60,6 @@ data class HimetricaConfig(
             enableLogging = enableLogging,
             maxQueueSize = maxQueueSize,
             flushIntervalMs = flushIntervalMs,
-            captureUncaughtExceptions = captureUncaughtExceptions,
             errorRateLimit = errorRateLimit,
             errorRateLimitWindowMs = errorRateLimitWindowMs,
         )

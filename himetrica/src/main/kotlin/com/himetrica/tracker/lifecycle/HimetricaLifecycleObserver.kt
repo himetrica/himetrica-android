@@ -1,8 +1,8 @@
-package com.himetrica.android.lifecycle
+package com.himetrica.tracker.lifecycle
 
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.himetrica.android.Himetrica
+import com.himetrica.tracker.Himetrica
 
 internal class HimetricaLifecycleObserver(
     private val himetrica: Himetrica,

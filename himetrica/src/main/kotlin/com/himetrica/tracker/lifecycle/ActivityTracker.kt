@@ -1,9 +1,9 @@
-package com.himetrica.android.lifecycle
+package com.himetrica.tracker.lifecycle
 
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import com.himetrica.android.Himetrica
+import com.himetrica.tracker.Himetrica
 
 internal class ActivityTracker(
     private val himetrica: Himetrica,
