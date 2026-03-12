@@ -1,21 +1,18 @@
 # Himetrica Android SDK
 
-Native Android analytics SDK for [Himetrica](https://app.himetrica.com). Mirrors the iOS (Swift) SDK's architecture adapted to Kotlin/Android idioms.
+Native Android analytics SDK for [Himetrica](https://app.himetrica.com).
 
 ## Installation
 
-Add the library module to your project. (Maven Central publishing coming soon.)
+Add the dependency to your app's `build.gradle.kts`:
 
-```groovy
-// settings.gradle.kts
-include(":himetrica")
-project(":himetrica").projectDir = file("path/to/himetrica")
-
-// app/build.gradle.kts
+```kotlin
 dependencies {
-    implementation(project(":himetrica"))
+    implementation("com.himetrica.tracker:himetrica-android:0.1.0")
 }
 ```
+
+Make sure Maven Central is in your repositories (`mavenCentral()` in `settings.gradle.kts`).
 
 ## Quick Start
 
@@ -43,12 +40,21 @@ Himetrica.configure(this, HimetricaConfig(
 ))
 ```
 
+Java:
+
+```java
+HimetricaConfig config = new HimetricaConfig.Builder("hm_pk_your_api_key")
+    .enableLogging(BuildConfig.DEBUG)
+    .build();
+Himetrica.configure(this, config);
+```
+
 ### Track Screens
 
 Screens are tracked automatically via `ActivityLifecycleCallbacks` when `autoTrackScreenViews = true`. For manual tracking:
 
 ```kotlin
-Himetrica.shared.trackScreen("HomeScreen", mapOf("section" to "featured"))
+Himetrica.shared.trackScreen("HomeScreen")
 ```
 
 ### Track Custom Events
@@ -96,8 +102,10 @@ fun HomeScreen() {
     // ... your content
 }
 
-// Or as a modifier
-Box(modifier = Modifier.trackScreen("HomeScreen")) {
+// Or with automatic duration tracking on dispose
+@Composable
+fun HomeScreen() {
+    TrackScreenWithDuration("HomeScreen")
     // ... your content
 }
 ```
@@ -106,21 +114,8 @@ Box(modifier = Modifier.trackScreen("HomeScreen")) {
 
 Events are queued to a file-based queue when offline and flushed automatically when connectivity is restored. The queue persists across process restarts.
 
-## Architecture
-
-| Class | Responsibility |
-|---|---|
-| `Himetrica` | Singleton facade, session management, screen duration |
-| `HimetricaConfig` | Configuration data class with Builder for Java |
-| `StorageManager` | SharedPreferences + file-based event queue |
-| `NetworkManager` | OkHttp transport, queue flush, connectivity monitoring |
-| `ErrorTracking` | UncaughtExceptionHandler, rate limiting, deduplication |
-| `HimetricaLifecycleObserver` | ProcessLifecycleOwner for foreground/background |
-| `ActivityTracker` | Auto screen tracking via ActivityLifecycleCallbacks |
-| `ComposeExtensions` | `TrackScreen` composable + `Modifier.trackScreen` |
-
 ## Requirements
 
 - **minSdk**: 21 (Android 5.0)
-- **compileSdk**: 34
-- Compose extensions require Jetpack Compose (optional)
+- **compileSdk**: 35
+- Compose extensions require Jetpack Compose (optional — the SDK works without it)
