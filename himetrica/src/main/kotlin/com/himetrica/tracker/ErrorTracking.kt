@@ -1,6 +1,5 @@
-package com.himetrica.android
+package com.himetrica.tracker
 
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import java.util.concurrent.Executors
@@ -14,8 +13,6 @@ internal class ErrorTracking(
     private val currentPath: () -> String,
     private val userAgent: String,
 ) {
-    private val json = Json { encodeDefaults = true; ignoreUnknownKeys = true }
-
     // Rate limiting
     private val errorTimestamps = mutableListOf<Long>()
     private val rateLimitLock = Any()
@@ -28,44 +25,11 @@ internal class ErrorTracking(
         Thread(r, "himetrica-dedup").apply { isDaemon = true }
     }
 
-    // Previous handler (chain)
-    private var previousHandler: Thread.UncaughtExceptionHandler? = null
-
-    fun setup() {
-        if (!config.captureUncaughtExceptions) return
-
-        previousHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            captureThrowable(throwable, severity = ErrorSeverity.ERROR, context = null)
-
-            // Chain to previous handler (this will typically kill the process)
-            previousHandler?.uncaughtException(thread, throwable)
-        }
-    }
-
     fun destroy() {
         scheduler.shutdown()
-        if (config.captureUncaughtExceptions && previousHandler != null) {
-            Thread.setDefaultUncaughtExceptionHandler(previousHandler)
-        }
     }
 
     fun captureError(throwable: Throwable, context: Map<String, Any>?, severity: ErrorSeverity) {
-        captureThrowable(throwable, severity, context)
-    }
-
-    fun captureMessage(message: String, severity: ErrorSeverity, context: Map<String, Any>?) {
-        sendErrorEvent(
-            type = "console",
-            message = message,
-            stack = null,
-            source = null,
-            severity = severity,
-            context = context,
-        )
-    }
-
-    private fun captureThrowable(throwable: Throwable, severity: ErrorSeverity, context: Map<String, Any>?) {
         val stack = throwable.stackTrace
             .take(20)
             .joinToString("\n") { "    at ${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})" }
@@ -75,6 +39,17 @@ internal class ErrorTracking(
             message = "${throwable.javaClass.simpleName}: ${throwable.message ?: "Unknown error"}",
             stack = stack,
             source = throwable.javaClass.name,
+            severity = severity,
+            context = context,
+        )
+    }
+
+    fun captureMessage(message: String, severity: ErrorSeverity, context: Map<String, Any>?) {
+        sendErrorEvent(
+            type = "console",
+            message = message,
+            stack = null,
+            source = null,
             severity = severity,
             context = context,
         )

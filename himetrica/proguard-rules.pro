@@ -10,10 +10,10 @@
 }
 
 # Himetrica models
--keep,includedescriptorclasses class com.himetrica.android.**$$serializer { *; }
--keepclassmembers class com.himetrica.android.** {
+-keep,includedescriptorclasses class com.himetrica.tracker.**$$serializer { *; }
+-keepclassmembers class com.himetrica.tracker.** {
     *** Companion;
 }
--keepclasseswithmembers class com.himetrica.android.** {
+-keepclasseswithmembers class com.himetrica.tracker.** {
     kotlinx.serialization.KSerializer serializer(...);
 }

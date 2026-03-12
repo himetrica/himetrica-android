@@ -1,18 +1,21 @@
 # Himetrica Android SDK
 
-Native Android analytics SDK for [Himetrica](https://app.himetrica.com).
+Native Android analytics SDK for [Himetrica](https://app.himetrica.com). Mirrors the iOS (Swift) SDK's architecture adapted to Kotlin/Android idioms.
 
 ## Installation
 
-Add the dependency to your app's `build.gradle.kts`:
+Add the library module to your project. (Maven Central publishing coming soon.)
 
-```kotlin
+```groovy
+// settings.gradle.kts
+include(":himetrica")
+project(":himetrica").projectDir = file("path/to/himetrica")
+
+// app/build.gradle.kts
 dependencies {
-    implementation("com.himetrica.tracker:himetrica-android:0.1.0")
+    implementation(project(":himetrica"))
 }
 ```
-
-Make sure Maven Central is in your repositories (`mavenCentral()` in `settings.gradle.kts`).
 
 ## Quick Start
 
@@ -36,17 +39,7 @@ Himetrica.configure(this, HimetricaConfig(
     sessionTimeoutMs = 30 * 60 * 1000L,
     autoTrackScreenViews = true,
     enableLogging = BuildConfig.DEBUG,
-    captureUncaughtExceptions = true,
 ))
-```
-
-Java:
-
-```java
-HimetricaConfig config = new HimetricaConfig.Builder("hm_pk_your_api_key")
-    .enableLogging(BuildConfig.DEBUG)
-    .build();
-Himetrica.configure(this, config);
 ```
 
 ### Track Screens
@@ -54,7 +47,7 @@ Himetrica.configure(this, config);
 Screens are tracked automatically via `ActivityLifecycleCallbacks` when `autoTrackScreenViews = true`. For manual tracking:
 
 ```kotlin
-Himetrica.shared.trackScreen("HomeScreen")
+Himetrica.shared.trackScreen("HomeScreen", mapOf("section" to "featured"))
 ```
 
 ### Track Custom Events
@@ -75,7 +68,7 @@ Himetrica.shared.identify(
 
 ### Error Tracking
 
-Uncaught exceptions are captured automatically. For manual capture:
+Capture errors manually in your catch blocks. Errors are rate-limited (max 10/minute) and deduplicated (5-minute window).
 
 ```kotlin
 try {
@@ -102,10 +95,8 @@ fun HomeScreen() {
     // ... your content
 }
 
-// Or with automatic duration tracking on dispose
-@Composable
-fun HomeScreen() {
-    TrackScreenWithDuration("HomeScreen")
+// Or as a modifier
+Box(modifier = Modifier.trackScreen("HomeScreen")) {
     // ... your content
 }
 ```
@@ -114,8 +105,21 @@ fun HomeScreen() {
 
 Events are queued to a file-based queue when offline and flushed automatically when connectivity is restored. The queue persists across process restarts.
 
+## Architecture
+
+| Class | Responsibility |
+|---|---|
+| `Himetrica` | Singleton facade, session management, screen duration |
+| `HimetricaConfig` | Configuration data class with Builder for Java |
+| `StorageManager` | SharedPreferences + file-based event queue |
+| `NetworkManager` | OkHttp transport, queue flush, connectivity monitoring |
+| `ErrorTracking` | Manual error capture, rate limiting, deduplication |
+| `HimetricaLifecycleObserver` | ProcessLifecycleOwner for foreground/background |
+| `ActivityTracker` | Auto screen tracking via ActivityLifecycleCallbacks |
+| `ComposeExtensions` | `TrackScreen` composable + `Modifier.trackScreen` |
+
 ## Requirements
 
 - **minSdk**: 21 (Android 5.0)
-- **compileSdk**: 35
-- Compose extensions require Jetpack Compose (optional — the SDK works without it)
+- **compileSdk**: 34
+- Compose extensions require Jetpack Compose (optional)

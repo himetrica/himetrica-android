@@ -1,4 +1,4 @@
-package com.himetrica.android
+package com.himetrica.tracker
 
 import android.content.Context
 import android.content.pm.PackageManager

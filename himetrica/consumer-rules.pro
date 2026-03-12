@@ -1,8 +1,8 @@
 # Keep public API classes
--keep class com.himetrica.android.Himetrica { *; }
--keep class com.himetrica.android.HimetricaConfig { *; }
--keep class com.himetrica.android.HimetricaConfig$Builder { *; }
--keep class com.himetrica.android.ErrorSeverity { *; }
+-keep class com.himetrica.tracker.Himetrica { *; }
+-keep class com.himetrica.tracker.HimetricaConfig { *; }
+-keep class com.himetrica.tracker.HimetricaConfig$Builder { *; }
+-keep class com.himetrica.tracker.ErrorSeverity { *; }
 
 # kotlinx.serialization
 -keepattributes *Annotation*, InnerClasses
@@ -16,16 +16,16 @@
 }
 
 # Keep serializable models
--keep,includedescriptorclasses class com.himetrica.android.**$$serializer { *; }
--keepclassmembers class com.himetrica.android.** {
+-keep,includedescriptorclasses class com.himetrica.tracker.**$$serializer { *; }
+-keepclassmembers class com.himetrica.tracker.** {
     *** Companion;
 }
--keepclasseswithmembers class com.himetrica.android.** {
+-keepclasseswithmembers class com.himetrica.tracker.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
 # Keep Compose extensions if Compose is present
--keep class com.himetrica.android.compose.** { *; }
+-keep class com.himetrica.tracker.compose.** { *; }
 
 # OkHttp
 -dontwarn okhttp3.**

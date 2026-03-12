@@ -1,10 +1,10 @@
-package com.himetrica.android
+package com.himetrica.tracker
 
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import com.himetrica.android.lifecycle.ActivityTracker
-import com.himetrica.android.lifecycle.HimetricaLifecycleObserver
+import com.himetrica.tracker.lifecycle.ActivityTracker
+import com.himetrica.tracker.lifecycle.HimetricaLifecycleObserver
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -17,8 +17,10 @@ class Himetrica private constructor(
 ) {
     private val appContext: Context = context.applicationContext
     private val storageManager = StorageManager(appContext)
-    private val networkManager = NetworkManager(config, storageManager, appContext)
     private val deviceInfo = DeviceInfo(appContext)
+    private val userAgent: String =
+        "Himetrica-Android/${deviceInfo.appVersion} (${deviceInfo.deviceModel}; Android ${deviceInfo.osVersion})"
+    private val networkManager = NetworkManager(config, storageManager, appContext, userAgent)
     private var errorTracking: ErrorTracking? = null
 
     private val json = Json { encodeDefaults = true; ignoreUnknownKeys = true }
@@ -36,9 +38,6 @@ class Himetrica private constructor(
 
     // Background tracking (managed by lifecycle observer)
     internal var backgroundAt: Long = 0L
-
-    private val userAgent: String =
-        "Himetrica-Android/${deviceInfo.appVersion} (${deviceInfo.deviceModel}; Android ${deviceInfo.osVersion})"
 
     init {
         setupErrorTracking()
@@ -325,7 +324,6 @@ class Himetrica private constructor(
             },
             userAgent = userAgent,
         )
-        errorTracking?.setup()
     }
 
     private fun setupLifecycleObservers() {

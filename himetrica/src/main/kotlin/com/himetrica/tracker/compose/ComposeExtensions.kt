@@ -1,10 +1,10 @@
-package com.himetrica.android.compose
+package com.himetrica.tracker.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import com.himetrica.android.Himetrica
+import com.himetrica.tracker.Himetrica
 
 /**
  * Tracks a screen view when this composable enters composition.

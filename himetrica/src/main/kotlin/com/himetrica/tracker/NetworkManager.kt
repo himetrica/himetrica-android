@@ -1,4 +1,4 @@
-package com.himetrica.android
+package com.himetrica.tracker
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -26,6 +26,7 @@ internal class NetworkManager(
     private val config: HimetricaConfig,
     private val storageManager: StorageManager,
     context: Context,
+    private val userAgent: String = "Himetrica-Android",
 ) {
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -111,6 +112,7 @@ internal class NetworkManager(
             .post(body)
             .header("Content-Type", "application/json")
             .header("X-API-Key", config.apiKey)
+            .header("User-Agent", userAgent)
             .build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -141,6 +143,7 @@ internal class NetworkManager(
             .post(body)
             .header("Content-Type", "application/json")
             .header("X-API-Key", config.apiKey)
+            .header("User-Agent", userAgent)
             .build()
 
         client.newCall(request).enqueue(object : Callback {
