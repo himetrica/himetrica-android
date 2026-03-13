@@ -1,21 +1,20 @@
 # Himetrica Android SDK
 
-Native Android analytics SDK for [Himetrica](https://app.himetrica.com). Mirrors the iOS (Swift) SDK's architecture adapted to Kotlin/Android idioms.
+Native Android analytics SDK for [Himetrica](https://www.himetrica.com).
+
+
 
 ## Installation
 
-Add the library module to your project. (Maven Central publishing coming soon.)
+Add the dependency to your app's `build.gradle.kts`:
 
-```groovy
-// settings.gradle.kts
-include(":himetrica")
-project(":himetrica").projectDir = file("path/to/himetrica")
-
-// app/build.gradle.kts
+```kotlin
 dependencies {
-    implementation(project(":himetrica"))
+    implementation("com.himetrica.tracker:himetrica-android:<version>")
 }
 ```
+
+Make sure Maven Central is in your repositories (`mavenCentral()` in `settings.gradle.kts`).
 
 ## Quick Start
 
