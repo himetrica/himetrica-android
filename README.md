@@ -93,11 +93,6 @@ fun HomeScreen() {
     TrackScreen("HomeScreen")
     // ... your content
 }
-
-// Or as a modifier
-Box(modifier = Modifier.trackScreen("HomeScreen")) {
-    // ... your content
-}
 ```
 
 ## Offline Support
@@ -115,10 +110,10 @@ Events are queued to a file-based queue when offline and flushed automatically w
 | `ErrorTracking` | Manual error capture, rate limiting, deduplication |
 | `HimetricaLifecycleObserver` | ProcessLifecycleOwner for foreground/background |
 | `ActivityTracker` | Auto screen tracking via ActivityLifecycleCallbacks |
-| `ComposeExtensions` | `TrackScreen` composable + `Modifier.trackScreen` |
+| `ComposeExtensions` | `TrackScreen` composable for Jetpack Compose |
 
 ## Requirements
 
 - **minSdk**: 21 (Android 5.0)
-- **compileSdk**: 34
+- **compileSdk**: 35
 - Compose extensions require Jetpack Compose (optional)
